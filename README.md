@@ -18,7 +18,7 @@ Top-1 accuracy comparison under partial-white box environment.
 
 
 ## Citation
-
+If you find the project codes useful for your research, please consider citing.
 ```
 @article{hong2023knowledge,
   title={Knowledge distillation vulnerability of DeiT through CNN adversarial attack},
