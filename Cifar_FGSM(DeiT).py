@@ -66,39 +66,36 @@ def test( model, device, test_loader, epsilon ):
     adv_examples = []
     img_len = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     loop = tqdm(enumerate(test_loader), total=len(test_loader))
-    # 테스트 셋의 모든 예제에 대해 루프를 돕니다
+
     for i, data in loop:
-        # 디바이스(CPU or GPU) 에 데이터와 라벨 값을 보냅니다
+        
         inputs, labels = data
         inputs, labels = inputs.to(device), labels.to(device)
 
-        # 텐서의 속성 중 requires_grad 를 설정합니다. 공격에서 중요한 부분입니다
+
         inputs.requires_grad = True
 
-        # 데이터를 모델에 통과시킵니다
+
         output = model(inputs)
-        init_pred = output.max(1, keepdim=True)[1] # 로그 확률의 최대값을 가지는 인덱스를 얻습니다
+        init_pred = output.max(1, keepdim=True)[1] 
         init_pred = init_pred.squeeze()
 
 
-        # 손실을 계산합니다
         loss = F.nll_loss(output, labels)
-        # 모델의 변화도들을 전부 0으로 설정합니다
+
         model.zero_grad()
-        # 후방 전달을 통해 모델의 변화도를 계산합니다
+
         loss.backward()
-        # 변화도 값을 모읍니다
         data_grad = inputs.grad
-        # FGSM 공격을 호출합니다
+        # FGSM 공격 호출
 
         perturbed_data = fgsm_attack(inputs, epsilon, data_grad)
-        # 작은 변화가 적용된 이미지에 대해 재분류합니다
+        # 작은 변화가 적용된 이미지에 대해 재분류
         output = model(perturbed_data)
         # if epsilon == 0:
         #     output = model(inputs)
 
-        # 올바른지 확인합니다
-        final_pred = output.max(1, keepdim=True)[1] # 로그 확률의 최대값을 가지는 인덱스를 얻습니다
+        final_pred = output.max(1, keepdim=True)[1] 
 
         if final_pred.squeeze() == labels.squeeze():
             correct += 1
@@ -200,7 +197,7 @@ plt.show()
 
 
 
-# # 각 엡실론에서 적대적 샘플의 몇 가지 예를 도식화합니다
+
 # for i in tqdm(range(len(epsilons)), desc="epsilon generation", leave=True):
 #     print("epsilon"+str(epsilons[i])+" generation start")
 #     for j in tqdm(range(len(examples[i])), desc="class generation", leave=True):
